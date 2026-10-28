@@ -28,6 +28,7 @@ const configured=SUPABASE_URL.startsWith('https://') && !SUPABASE_PUBLIC_KEY.sta
 const sb=configured && window.supabase ? window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLIC_KEY) : null;
 const people=['Carlos','Karine','Bruna','Erick','João','Willyan','Rodrigo'];
 let sessionUser=null,member=null,theories=[],votes=[],comments=[],evidence=[],nodes=[],links=[],audits=[],activity=[],currentTab='painel';
+const $=id=>document.getElementById(id);
 let modalEditing=false,modalBusy=false;const DRAFT_PREFIX='ultimo-sinal-v41-draft-';
 function draftKey(){return DRAFT_PREFIX+(sessionUser?.id||'anon')+'-'+currentTab}
 function saveDraft(){const m=$('modal-content');if(!m||!sessionUser)return;const data={};m.querySelectorAll('input:not([type=file]),textarea,select').forEach((el,i)=>{if(el.type==='password')return;data[el.dataset.draftKey||el.id||el.name||'field-'+i]=el.value});try{localStorage.setItem(draftKey(),JSON.stringify(data))}catch(e){}}
@@ -35,7 +36,6 @@ function restoreDraft(){const m=$('modal-content');if(!m)return;let data;try{dat
 function clearDraft(){try{localStorage.removeItem(draftKey())}catch(e){}}
 $('modal-content')?.addEventListener('input',e=>{if(e.target.matches('input,textarea,select')){modalEditing=true;saveDraft()}});
 $('modal-content')?.addEventListener('change',e=>{if(e.target.matches('input,textarea,select')){modalEditing=true;saveDraft()}});
-const $=id=>document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function notice(msg,err=false){const el=$('livebar');el.textContent=msg;el.classList.toggle('error',err);console[err?'error':'info']('[EQUIPE1]',msg)}
 function errorMsg(err,where){const msg=(err?.message||String(err));notice(where+': '+msg,true);return msg}
