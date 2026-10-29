@@ -9,6 +9,9 @@
 .layout > .panel:first-child #node-detail{height:106px;min-height:0;max-height:106px;overflow-y:auto;overflow-x:hidden;overflow-wrap:anywhere;white-space:normal;line-height:1.6;padding:9px 11px;scrollbar-width:thin}
 .layout > .panel:first-child #node-detail .btn{display:block;margin:9px 0 0!important}
 @media(max-width:680px){.layout > .panel:first-child .network{height:230px}.layout > .panel:first-child{min-height:395px}.layout > .panel:first-child #node-detail{height:118px;max-height:118px}}
+
+/* V4.3 radar and shared audio */
+.radar{cursor:pointer}.radar-focus{padding:8px 11px;border-top:1px solid var(--line);font-size:10px;line-height:1.6;color:#a7d3d5;max-height:105px;overflow:auto}.audio-player{width:100%;max-width:480px;margin:7px 0;accent-color:var(--cyan)}.voice-controls{border:1px solid #345064;background:#0a1924;padding:12px;margin:12px 0}.voice-controls button{margin:4px}.recording{color:#ff6673;font-weight:bold}.radar-axis{cursor:pointer}.radar-axis:hover{fill:#fff}
 </style></head><body>
 <header><div class="brand">◈ ÚLTIMO <b>SINAL</b><small>INTELLIGENCE OS // EQUIPE 01</small></div><nav class="nav"><button class="active" onclick="go('painel',this)">MISSION CONTROL</button><button onclick="go('evidencias',this)">EVIDÊNCIAS</button><button onclick="go('teorias',this)">HIPÓTESES & VOTOS</button><button onclick="go('equipe',this)">AGENTES</button><button onclick="go('auditoria',this)">AUDITOR NOAH</button></nav><div class="status">● SISTEMA CONECTADO</div></header>
 <div class="ticker">⚠ DOSSIÊ 01 // HENRIQUE DUARTE NÃO LOCALIZADO <span>HALLOWEEN 2026 · FINAL 30/10 · INVESTIGAÇÃO EM CURSO</span></div>
@@ -19,7 +22,7 @@
 <article class="panel inspector"><div class="panel-title">▣ INSPECTOR <em>CASO 001</em></div><div class="target"><label>ALVO PRINCIPAL / CENTRAL DE OPERAÇÕES</label><h2>HENRIQUE DUARTE</h2><span class="chip">PARADEIRO DESCONHECIDO</span></div><div class="conclusion"><b>◈ SÍNTESE INVESTIGATIVA</b><br>Última comunicação relatada às 17h05. Testemunha relata pessoa seguindo em direção à área de serviço às 17h10, sem identificação confirmada.</div><div class="panel-body"><span class="mini-label">PONTOS CRÍTICOS</span><ul><li>Retorno à Central não registrado</li><li>Identidade da pessoa avistada não confirmada</li><li>Horário real de fim de expediente desconhecido</li><li>Saída do shopping não comprovada</li></ul></div></article>
 <article class="panel"><div class="panel-title">▤ REGISTROS DA MISSÃO <em>LINHA DO TEMPO</em></div><div class="panel-body feed"><div class="event"><small>26 OUT · CONVOCAÇÃO</small><p>Três equipes anunciadas originalmente; pistas distribuídas pelo shopping.</p></div><div class="event purple"><small>26 OUT · COMUNICADO</small><p>Desaparecimento de Henrique Duarte comunicado.</p></div><div class="event"><small>27 OUT · 17:05</small><p>Henrique sai para verificar uma área; não há registro de retorno.</p></div><div class="event purple"><small>27 OUT · 17:10 / 18:20</small><p>Avistamento relatado e depoimento registrado, respectivamente.</p></div></div></article>
 <article class="panel"><div class="panel-title">⌘ TERMINAL OPERACIONAL <em>REGISTRO LOCAL</em></div><div class="terminal" id="terminal"><div class="dim">[SYS] INICIALIZANDO CENTRAL DE INTELIGÊNCIA...</div><div>[OK] EQUIPE 01 IDENTIFICADA · 7 AGENTES</div><div>[OK] DOSSIÊ 01 CARREGADO</div><div class="warn">[ALERTA] H-001 AINDA NÃO COMPROVADA</div><div>[SCAN] VERIFICANDO CONTRADIÇÕES DE HORÁRIO</div><div class="dim">[INFO] Sincronização Supabase · a cada 30 segundos, sem interromper formulários em edição.</div></div></article>
-<article class="panel"><div class="panel-title">◇ RADAR DE CONSISTÊNCIA <em>AVALIAÇÃO QUALITATIVA</em></div><svg class="radar" viewBox="0 0 390 225" role="img" aria-label="Radar ilustrativo de consistência da hipótese H-001"><g transform="translate(195 112)"><polygon points="0,-83 79,-26 49,67 -49,67 -79,-26" fill="none" stroke="#365064"/><polygon points="0,-56 53,-17 33,45 -33,45 -53,-17" fill="none" stroke="#365064"/><polygon points="0,-28 27,-9 16,22 -16,22 -27,-9" fill="none" stroke="#365064"/><path d="M0 -83V0M79 -26L0 0M49 67L0 0M-49 67L0 0M-79 -26L0 0" stroke="#304653"/><polygon points="0,-66 44,-14 13,18 -17,24 -50,-16" fill="#31d4c444" stroke="#37d6d0" stroke-width="2"/><circle r="3" fill="#37d6d0"/></g><g><text x="195" y="15" text-anchor="middle">HORÁRIOS</text><text x="295" y="81">DEPOIMENTO</text><text x="260" y="201">REGISTROS</text><text x="73" y="201">SIMPLICIDADE</text><text x="13" y="81">CONFIRMAÇÃO</text></g></svg><div class="detail">Valores ilustrativos para debate; não são probabilidades nem medições científicas.</div></article>
+<article class="panel"><div class="panel-title">◇ RADAR DE CONSISTÊNCIA <em>AVALIAÇÃO QUALITATIVA</em></div><svg class="radar" viewBox="0 0 390 225" role="img" aria-label="Radar calculado com base nos registros da equipe" id="radar-svg"><g transform="translate(195 112)"><polygon points="0,-83 79,-26 49,67 -49,67 -79,-26" fill="none" stroke="#365064"/><polygon points="0,-56 53,-17 33,45 -33,45 -53,-17" fill="none" stroke="#365064"/><polygon points="0,-28 27,-9 16,22 -16,22 -27,-9" fill="none" stroke="#365064"/><path d="M0 -83V0M79 -26L0 0M49 67L0 0M-49 67L0 0M-79 -26L0 0" stroke="#304653"/><polygon points="0,-66 44,-14 13,18 -17,24 -50,-16" fill="#31d4c444" stroke="#37d6d0" stroke-width="2"/><circle r="3" fill="#37d6d0"/></g><g><text x="195" y="15" text-anchor="middle">HORÁRIOS</text><text x="295" y="81">DEPOIMENTO</text><text x="260" y="201">REGISTROS</text><text x="73" y="201">SIMPLICIDADE</text><text x="13" y="81">CONFIRMAÇÃO</text></g></svg><div class="radar-focus" id="radar-explain">Aguardando dados para calcular os indicadores. Clique em um eixo para ver a regra.</div></article>
 </section>
 <section class="bottom"><article class="panel"><div class="panel-title">◈ HIPÓTESES ATIVAS <em id="count-theories">01 REGISTRO</em></div><div class="case-list" id="theory-list"></div><div class="panel-body"><button class="btn" onclick="openModal('teorias')">+ REGISTRAR TEORIA</button></div></article><article class="panel"><div class="panel-title">◈ PISTAS SOB OBSERVAÇÃO <em id="count-clues">REGISTROS DA EQUIPE</em></div><div class="case-list" id="clue-list"></div></article><article class="panel"><div class="panel-title">⌁ AGENTES DA EQUIPE 01 <em>UNIDADE ATIVA</em></div><div class="panel-body" id="agents" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div><div class="detail">Acesso restrito aos integrantes autorizados.</div></article></section><div class="footer">OPERAÇÃO O ÚLTIMO SINAL // EQUIPE 01 · PORTAL COLABORATIVO · HALLOWEEN 2026</div></main>
 <div class="modal-bg" id="modal-bg"><div class="modal"><button class="close" onclick="closeModal()">×</button><div id="modal-content"></div></div></div>
@@ -35,7 +38,7 @@ const sb=configured && window.supabase ? window.supabase.createClient(SUPABASE_U
 const people=['Carlos','Karine','Bruna','Erick','João','Willyan','Rodrigo'];
 let sessionUser=null,member=null,theories=[],votes=[],comments=[],evidence=[],nodes=[],links=[],audits=[],activity=[],currentTab='painel';
 const $=id=>document.getElementById(id);
-let modalEditing=false,modalBusy=false;const DRAFT_PREFIX='ultimo-sinal-v41-draft-';
+let modalEditing=false,modalBusy=false;let voiceRecorder=null,voiceChunks=[],voiceStream=null,voiceBusy=false;let radarSelected=0;const DRAFT_PREFIX='ultimo-sinal-v41-draft-';
 function draftKey(){return DRAFT_PREFIX+(sessionUser?.id||'anon')+'-'+currentTab}
 function saveDraft(){const m=$('modal-content');if(!m||!sessionUser)return;const data={};m.querySelectorAll('input:not([type=file]),textarea,select').forEach((el,i)=>{if(el.type==='password')return;data[el.dataset.draftKey||el.id||el.name||'field-'+i]=el.value});try{localStorage.setItem(draftKey(),JSON.stringify(data))}catch(e){}}
 function restoreDraft(){const m=$('modal-content');if(!m)return;let data;try{data=JSON.parse(localStorage.getItem(draftKey())||'null')}catch(e){}if(!data)return;m.querySelectorAll('input:not([type=file]),textarea,select').forEach((el,i)=>{const k=el.dataset.draftKey||el.id||el.name||'field-'+i;if(Object.prototype.hasOwnProperty.call(data,k))el.value=data[k]})}
@@ -47,7 +50,7 @@ function notice(msg,err=false){const el=$('livebar');el.textContent=msg;el.class
 function errorMsg(err,where){const msg=(err?.message||String(err));notice(where+': '+msg,true);return msg}
 function log(msg){const t=$('terminal');if(!t)return;const d=document.createElement('div');d.textContent='[SISTEMA] '+msg;t.appendChild(d);t.scrollTop=t.scrollHeight}
 function openModal(type){currentTab=type;modalEditing=false;const m=$('modal-content');m.innerHTML='<h2>◈ CARREGANDO '+esc(type.toUpperCase())+'...</h2>';$('modal-bg').classList.add('open');renderModal(type)}
-function closeModal(){$('modal-bg').classList.remove('open');modalEditing=false}
+function closeModal(){if(voiceRecorder?.state==='recording'){voiceRecorder.stop()}stopVoiceStream();$('modal-bg').classList.remove('open');modalEditing=false}
 function modalStatus(msg,err=false){let el=$('modal-feedback');if(!el){el=document.createElement('p');el.id='modal-feedback';el.className='note';$('modal-content')?.prepend(el)}el.textContent=msg;el.style.color=err?'#ff8c94':'#73d6b4';el.style.padding='10px';el.style.border='1px solid '+(err?'#9c4354':'#2c685e');el.style.background='#101f29';el.scrollIntoView({behavior:'smooth',block:'nearest'});notice(msg,err)}
 $('modal-bg').addEventListener('click',e=>{if(e.target.id==='modal-bg')closeModal()});
 function go(tab,el){document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));el.classList.add('active');if(tab==='painel')closeModal();else openModal(tab)}
@@ -64,7 +67,7 @@ requireData(sb.from('case_nodes').select('*'),'Nós'),
 requireData(sb.from('case_links').select('*'),'Conexões'),
 requireData(sb.from('audit_reports').select('*').order('created_at',{ascending:false}),'Auditorias'),
 requireData(sb.from('activity_log').select('*').order('created_at',{ascending:false}).limit(50),'Atividades')]);
-window.teamMembers=ms;theories=ts;votes=vs;comments=cs;evidence=es;nodes=ns;links=ls;audits=as;activity=acts;render();renderGraph();if($('modal-bg').classList.contains('open')&&!modalEditing&&!modalBusy)renderModal(currentTab);notice('SINCRONIZADO · '+new Date().toLocaleTimeString('pt-BR'));
+window.teamMembers=ms;theories=ts;votes=vs;comments=cs;evidence=es;nodes=ns;links=ls;audits=as;activity=acts;render();renderGraph();renderRadar();if($('modal-bg').classList.contains('open')&&!modalEditing&&!modalBusy&&!voiceBusy&&voiceRecorder?.state!=='recording')renderModal(currentTab);notice('SINCRONIZADO · '+new Date().toLocaleTimeString('pt-BR'));
 }catch(e){errorMsg(e,'Sincronização')}}
 function nameOf(id){return window.teamMembers?.find(m=>m.user_id===id)?.display_name||'Agente'}
 function render(){if($('agents'))$('agents').innerHTML=(window.teamMembers||[]).map((p,i)=>`<div class="case" style="padding:7px"><b>${String(i+1).padStart(2,'0')}</b><span>${esc(p.display_name)}</span></div>`).join('');
@@ -82,7 +85,7 @@ async function addEvidence(e){
  e.preventDefault();if(modalBusy)return;
  const f=e.target,files=Array.from(f.querySelector('input[type=file]').files);
  if(!files.length){notice('Selecione pelo menos um arquivo.',true);return}
- const allowed=['image/jpeg','image/png','image/webp','application/pdf','audio/mpeg','audio/mp4','audio/wav'];
+ const allowed=['image/jpeg','image/png','image/webp','application/pdf','audio/mpeg','audio/mp4','audio/wav','audio/x-wav','audio/wave','audio/ogg','audio/webm','audio/x-m4a','audio/aac','audio/mp3'];
  const bad=files.find(file=>file.size>10*1024*1024||!allowed.includes(file.type));
  if(bad){notice('Arquivo inválido ou maior que 10 MB: '+bad.name,true);return}
  const title=f.querySelector('[name=title]').value.trim(),description=f.querySelector('[name=description]').value.trim(),locationLabel=f.querySelector('[name=location]').value.trim();
@@ -104,6 +107,10 @@ async function addEvidence(e){
   else{clearDraft();closeModal();notice(success+' EVIDÊNCIA(S) ENVIADA(S) COM SUCESSO')}
  }finally{modalBusy=false;button.disabled=false}
 }
+async function playAudio(path,button){
+ try{button.disabled=true;button.textContent='CARREGANDO ÁUDIO...';const {data,error}=await sb.storage.from('team-evidence').createSignedUrl(path,3600);if(error)throw error;
+ const container=button.parentElement;let audio=container.querySelector('audio');if(!audio){audio=document.createElement('audio');audio.className='audio-player';audio.controls=true;audio.preload='none';container.appendChild(audio)}audio.src=data.signedUrl;await audio.play().catch(()=>{});button.textContent='RECARREGAR ÁUDIO';
+ }catch(e){errorMsg(e,'Reprodução');button.textContent='TENTAR NOVAMENTE'}finally{button.disabled=false}}
 async function openFile(path){try{const {data,error}=await sb.storage.from('team-evidence').createSignedUrl(path,60);if(error)throw error;window.open(data.signedUrl,'_blank','noopener,noreferrer')}catch(e){errorMsg(e,'Abrir arquivo')}}
 async function addNode(e){
  e.preventDefault();if(modalBusy)return;const f=e.target,button=f.querySelector('button[type=submit]');
@@ -134,7 +141,7 @@ async function addLink(e){
 async function addAudit(e){e.preventDefault();const f=e.target;try{await requireData(sb.from('audit_reports').insert({title:f.querySelector('[name=title]').value,body:f.querySelector('[name=body]').value,author_id:sessionUser.id,verdict:'review'}),'Auditoria');await refresh()}catch(e){errorMsg(e,'Auditoria')}}
 function renderModal(type){const m=$('modal-content');if(!m)return;let h='';
 if(type==='teorias'){h=`<h2>◈ LABORATÓRIO DE HIPÓTESES</h2><form onsubmit="addTheory(event)"><label>TÍTULO</label><input class="field" id="theory-title" required maxlength="120"><label>ARGUMENTAÇÃO / EVIDÊNCIAS / OBJEÇÕES</label><textarea class="field" id="theory-desc" required maxlength="8000"></textarea><button class="btn">PUBLICAR HIPÓTESE</button></form><hr>${theories.map(t=>`<div class="record"><b>${esc(t.title)}</b> <small>por ${esc(nameOf(t.author_id))}</small><p>${esc(t.description)}</p><button onclick="vote('${t.id}')">▲ Apoiar (${votes.filter(v=>v.theory_id===t.id&&v.vote===1).length})</button><div>${comments.filter(c=>c.theory_id===t.id).map(c=>`<p><small>${esc(nameOf(c.author_id))}:</small> ${esc(c.body)}</p>`).join('')}</div><form onsubmit="addComment(event,'${t.id}')"><textarea class="field" data-draft-key="comment-${t.id}" required maxlength="3000" placeholder="Comentário, contraponto ou nova evidência"></textarea><button class="btn">COMENTAR</button></form></div>`).join('')||'<p>Nenhuma teoria publicada.</p>'}`}
-else if(type==='evidencias'){h=`<h2>▣ ARQUIVO DE EVIDÊNCIAS</h2><p class="muted">Envie uma ou várias imagens, PDFs ou áudios de até 10 MB por arquivo. Apenas investigadores autenticados podem acessar.</p><form onsubmit="addEvidence(event)"><label>TÍTULO</label><input class="field" name="title" required maxlength="150"><label>LOCAL / REFERÊNCIA</label><input class="field" name="location" maxlength="200"><label>DESCRIÇÃO</label><textarea class="field" name="description" maxlength="5000"></textarea><label>ARQUIVO</label><input class="field" type="file" multiple accept="image/jpeg,image/png,image/webp,application/pdf,audio/mpeg,audio/mp4,audio/wav" required><p class="note">Selecione várias fotos de uma vez. Cada arquivo será registrado separadamente com o mesmo contexto (limite de 10 MB por arquivo).</p><button class="btn" type="submit">ENVIAR EVIDÊNCIAS</button><p id="upload-progress" class="note" role="status" aria-live="polite"></p></form><hr>${evidence.map(e=>`<div class="record"><b>${esc(e.title)}</b><small> · ${esc(nameOf(e.author_id))} · ${new Date(e.created_at).toLocaleString('pt-BR')}</small><p>${esc(e.description||'')}<br>${esc(e.location_label||'')}</p>${e.file_path?`<button onclick="openFile('${esc(e.file_path)}')">ABRIR ANEXO PRIVADO</button>`:''}</div>`).join('')||'<p>Nenhum anexo publicado.</p>'}`}
+else if(type==='evidencias'){h=`<h2>▣ ARQUIVO DE EVIDÊNCIAS</h2><p class="muted">Envie uma ou várias imagens, PDFs ou áudios de até 10 MB por arquivo. Apenas investigadores autenticados podem acessar.</p><form onsubmit="addEvidence(event)"><label>TÍTULO</label><input class="field" name="title" required maxlength="150"><label>LOCAL / REFERÊNCIA</label><input class="field" name="location" maxlength="200"><label>DESCRIÇÃO</label><textarea class="field" name="description" maxlength="5000"></textarea><label>ARQUIVO</label><input class="field" type="file" multiple accept="image/jpeg,image/png,image/webp,application/pdf,audio/mpeg,audio/mp4,audio/wav,audio/ogg,audio/webm,audio/x-m4a,audio/aac" required><p class="note">Selecione várias fotos de uma vez. Cada arquivo será registrado separadamente com o mesmo contexto (limite de 10 MB por arquivo).</p><button class="btn" type="submit">ENVIAR EVIDÊNCIAS</button><p id="upload-progress" class="note" role="status" aria-live="polite"></p></form><div class="voice-controls"><b>🎙 COMUNICAÇÕES POR ÁUDIO DA EQUIPE</b><p class="note">Grave uma mensagem de voz e compartilhe com os investigadores. O navegador solicitará acesso ao microfone. A gravação será salva como evidência de áudio, sem criar tabelas novas.</p><label>ASSUNTO DA MENSAGEM</label><input class="field" id="voice-title" placeholder="Ex.: Relato sobre o acesso R-03" maxlength="120"><button class="btn" type="button" id="voice-start" onclick="startVoice()">● INICIAR GRAVAÇÃO</button><button class="btn" type="button" id="voice-stop" onclick="stopVoice()" disabled>■ FINALIZAR E ENVIAR</button><div id="voice-status" class="note" role="status" aria-live="polite">Aguardando gravação. Limite de 90 segundos.</div></div><hr>${evidence.map(e=>`<div class="record"><b>${esc(e.title)}</b><small> · ${esc(nameOf(e.author_id))} · ${new Date(e.created_at).toLocaleString('pt-BR')}</small><p>${esc(e.description||'')}<br>${esc(e.location_label||'')}</p>${e.file_path?`<button onclick="openFile('${esc(e.file_path)}')">ABRIR ANEXO PRIVADO</button>${e.kind==='audio'?`<button onclick="playAudio('${esc(e.file_path)}',this)">▶ OUVIR NA CENTRAL</button>`:''}`:''}</div>`).join('')||'<p>Nenhum anexo publicado.</p>'}`}
 else if(type==='equipe'){h=`<h2>◈ EQUIPE 01</h2>${(window.teamMembers||[]).map(p=>`<div class="record">${esc(p.display_name)} · ${esc(p.role)}</div>`).join('')}<button class="btn" onclick="logout()">SAIR DA CONTA</button>`}
 else if(type==='auditoria'){h=`<h2>⌁ AUDITORIA INVESTIGATIVA</h2><p class="muted">A IA não opera automaticamente neste portal. Exporte o dossiê e envie ao ChatGPT para revisão; um administrador poderá publicar o relatório validado.</p><button class="btn" onclick="exportData()">EXPORTAR DOSSIÊ JSON</button><hr>${member?.role==='admin'?`<form onsubmit="addAudit(event)"><label>TÍTULO DO PARECER</label><input class="field" name="title" required><label>ANÁLISE REVISADA</label><textarea class="field" name="body" required></textarea><button class="btn">PUBLICAR AUDITORIA</button></form>`:''}${audits.map(a=>`<div class="record"><b>${esc(a.title)}</b><p>${esc(a.body)}</p></div>`).join('')}`}
 else if(type==='conexoes'||type==='simular'){
@@ -146,6 +153,59 @@ else if(type==='conexoes'||type==='simular'){
 }
 else h=`<h2>◇ INVESTIGAÇÃO</h2><div class="record">Hipótese H-001: Henrique pode ter encerrado o expediente e ido para casa. Não confirmada.</div><button class="btn" onclick="openModal('conexoes')">MAPEAR RELAÇÕES</button><button class="btn" onclick="openModal('teorias')">CONFRONTAR TEORIAS</button>`;
 m.innerHTML=h;restoreDraft()}
+// V4.3: voz compartilhada usando a tabela evidence e o bucket existentes.
+function voiceStatus(message,isError=false){const el=$('voice-status');if(el){el.textContent=message;el.className=isError?'note recording':'note'}notice(message,isError)}
+function stopVoiceStream(){if(voiceStream){voiceStream.getTracks().forEach(t=>t.stop());voiceStream=null}}
+async function startVoice(){
+ if(voiceBusy||voiceRecorder?.state==='recording')return;
+ if(!navigator.mediaDevices?.getUserMedia||typeof MediaRecorder==='undefined'){voiceStatus('Este navegador não suporta gravação de áudio. Use HTTPS e um navegador atualizado.',true);return}
+ try{
+  voiceStream=await navigator.mediaDevices.getUserMedia({audio:true});
+  const types=['audio/webm;codecs=opus','audio/mp4','audio/webm','audio/ogg;codecs=opus'];
+  const mime=types.find(t=>MediaRecorder.isTypeSupported(t));
+  voiceRecorder=new MediaRecorder(voiceStream,mime?{mimeType:mime}:undefined);voiceChunks=[];
+  voiceRecorder.ondataavailable=e=>{if(e.data?.size)voiceChunks.push(e.data)};
+  voiceRecorder.onstop=async()=>{stopVoiceStream();clearTimeout(window.voiceTimeout);if(!$('modal-bg').classList.contains('open'))return;await submitVoice()};
+  voiceRecorder.start(1000);$('voice-start').disabled=true;$('voice-stop').disabled=false;voiceStatus('● GRAVANDO... Finalize para enviar (máximo 90 segundos).');
+  window.voiceTimeout=setTimeout(()=>{if(voiceRecorder?.state==='recording')stopVoice()},90000);
+ }catch(e){stopVoiceStream();voiceStatus('Microfone indisponível: '+(e.message||e),true)}
+}
+function stopVoice(){if(voiceRecorder?.state==='recording'){voiceRecorder.stop();const stop=$('voice-stop');if(stop)stop.disabled=true;voiceStatus('Finalizando e enviando áudio...')}}
+async function submitVoice(){
+ if(voiceBusy)return;voiceBusy=true;
+ try{
+  const mime=voiceRecorder?.mimeType?.split(';')[0]||'audio/webm';const blob=new Blob(voiceChunks,{type:mime});
+  if(!blob.size)throw new Error('A gravação ficou vazia.');
+  if(blob.size>10*1024*1024)throw new Error('Gravação maior que 10 MB. Faça uma mensagem menor.');
+  const ext=mime.includes('mp4')?'m4a':mime.includes('ogg')?'ogg':'webm';
+  const title=$('voice-title')?.value.trim()||'Mensagem de voz';
+  const path=sessionUser.id+'/'+crypto.randomUUID()+'-voz.'+ext;
+  const {error:uploadError}=await sb.storage.from('team-evidence').upload(path,blob,{contentType:mime,upsert:false});if(uploadError)throw uploadError;
+  await requireData(sb.from('evidence').insert({title:'🎙 '+title,description:'Mensagem de voz compartilhada pela equipe.',location_label:'COMUNICAÇÕES DA EQUIPE',kind:'audio',file_path:path,author_id:sessionUser.id}),'Registrar mensagem de voz');
+  voiceStatus('✓ Mensagem de voz publicada para a equipe.');modalEditing=false;await refresh();renderModal('evidencias');voiceStatus('✓ Mensagem publicada. Use OUVIR NA CENTRAL na lista abaixo.');
+ }catch(e){voiceStatus('Falha no envio da voz: '+(e.message||e),true)}
+ finally{voiceBusy=false;voiceChunks=[];if($('voice-start'))$('voice-start').disabled=false;if($('voice-stop'))$('voice-stop').disabled=true}
+}
+// Radar documental: cada eixo é cobertura de registros, NÃO probabilidade nem verdade da hipótese.
+const radarLabels=['HORÁRIOS','DEPOIMENTO','REGISTROS','SIMPLICIDADE','CONFIRMAÇÃO'];
+function radarStats(){
+ const allText=[...evidence.map(e=>[e.title,e.description,e.location_label].join(' ')),...nodes.map(n=>[n.label,n.description].join(' '))];
+ const timeCount=nodes.filter(n=>n.node_type==='time').length;
+ const withTime=allText.filter(t=>/\b(?:[01]?\d|2[0-3])\s*[:h]\s*[0-5]\d\b/i.test(t)).length;
+ const testimony=evidence.filter(e=>/testemunh|depoiment|relato/i.test([e.title,e.description].join(' '))).length;
+ const files=evidence.filter(e=>!!e.file_path).length;
+ const sourced=links.filter(l=>l.rationale?.trim()).length;
+ const simple=theories.length?Math.round(100/(1+Math.max(0,theories.length-1)*.25)):0;
+ const scores=[Math.min(100,(timeCount+withTime)*20),Math.min(100,testimony*25),Math.min(100,files*10),simple,Math.min(100,sourced*20)];
+ const details=[`${timeCount} nós do tipo Horário e ${withTime} registros com horário reconhecível. Regra: 20 pontos por ocorrência (limite 100). Não verifica contradições.`,`${testimony} evidências com palavras “testemunha”, “depoimento” ou “relato”. Regra: 25 pontos por registro (limite 100). Não confirma credibilidade.`,`${files} evidências com anexo. Regra: 10 pontos por arquivo (limite 100). Não avalia autenticidade.`,`${theories.length} hipóteses registradas. Indicador de foco: 100 com uma hipótese, reduz 20% por hipótese adicional aproximadamente. Não mede simplicidade lógica.`,`${sourced} ligações com justificativa textual. Regra: 20 pontos por ligação (limite 100). Justificativa não equivale a confirmação independente.`];
+ return {scores,details}
+}
+function renderRadar(){const svg=$('radar-svg');if(!svg)return;const {scores,details}=radarStats();const coords=scores.map((v,i)=>{const a=(-90+i*72)*Math.PI/180;return [195+83*v/100*Math.cos(a),112+83*v/100*Math.sin(a)]});
+ const shape=svg.querySelector('g[transform] polygon[fill]');if(shape)shape.setAttribute('points',coords.map(p=>p.map(n=>n.toFixed(1)).join(',')).join(' '));
+ svg.querySelectorAll('g:last-child text').forEach((el,i)=>{el.classList.add('radar-axis');el.setAttribute('tabindex','0');el.setAttribute('role','button');el.setAttribute('aria-label',radarLabels[i]+': '+scores[i]+' pontos. Mostrar cálculo');el.onclick=()=>showRadar(i);el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showRadar(i)}}});
+ showRadar(radarSelected);
+}
+function showRadar(i){radarSelected=i;const {scores,details}=radarStats();const el=$('radar-explain');if(el)el.textContent=radarLabels[i]+' · '+scores[i]+'/100 — '+details[i]+' Índice de cobertura documental, não de veracidade.'}
 const originalGraph=[{id:'Henrique',x:205,y:122,c:'#ff8b35',r:21,desc:'Henrique Duarte: paradeiro não confirmado.'},{id:'17:05',x:82,y:45,c:'#37d6d0',r:12,desc:'Última comunicação.'},{id:'17:10',x:328,y:45,c:'#b66bff',r:12,desc:'Avistamento de pessoa não identificada.'},{id:'Central',x:69,y:171,c:'#37d6d0',r:13,desc:'Central de Operações.'},{id:'Área serviço',x:328,y:175,c:'#b66bff',r:14,desc:'Direção do avistamento.'},{id:'H-001',x:206,y:225,c:'#ff8b35',r:12,desc:'Hipótese do falso desaparecimento.'},{id:'18:20',x:343,y:112,c:'#9caec2',r:10,desc:'Registro do depoimento.'}];
 function canManageNode(n){return !!sessionUser && (member?.role==='admin'||n.author_id===sessionUser.id)}
 async function deleteNode(id){
