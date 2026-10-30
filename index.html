@@ -38,7 +38,7 @@ const sb=configured && window.supabase ? window.supabase.createClient(SUPABASE_U
 const people=['Carlos','Karine','Bruna','Erick','João','Willyan','Rodrigo'];
 let sessionUser=null,member=null,theories=[],votes=[],comments=[],evidence=[],nodes=[],links=[],audits=[],activity=[],currentTab='painel';
 const $=id=>document.getElementById(id);
-let modalEditing=false,modalBusy=false;let voiceRecorder=null,voiceChunks=[],voiceStream=null,voiceBusy=false;let radarSelected=0;const DRAFT_PREFIX='ultimo-sinal-v41-draft-';
+let modalEditing=false,modalBusy=false;let voiceRecorder=null,voiceChunks=[],voiceStream=null,voiceBusy=false,voiceMime="",voiceRecordedTitle="";let radarSelected=0;const DRAFT_PREFIX='ultimo-sinal-v41-draft-';
 function draftKey(){return DRAFT_PREFIX+(sessionUser?.id||'anon')+'-'+currentTab}
 function saveDraft(){const m=$('modal-content');if(!m||!sessionUser)return;const data={};m.querySelectorAll('input:not([type=file]),textarea,select').forEach((el,i)=>{if(el.type==='password')return;data[el.dataset.draftKey||el.id||el.name||'field-'+i]=el.value});try{localStorage.setItem(draftKey(),JSON.stringify(data))}catch(e){}}
 function restoreDraft(){const m=$('modal-content');if(!m)return;let data;try{data=JSON.parse(localStorage.getItem(draftKey())||'null')}catch(e){}if(!data)return;m.querySelectorAll('input:not([type=file]),textarea,select').forEach((el,i)=>{const k=el.dataset.draftKey||el.id||el.name||'field-'+i;if(Object.prototype.hasOwnProperty.call(data,k))el.value=data[k]})}
@@ -50,7 +50,7 @@ function notice(msg,err=false){const el=$('livebar');el.textContent=msg;el.class
 function errorMsg(err,where){const msg=(err?.message||String(err));notice(where+': '+msg,true);return msg}
 function log(msg){const t=$('terminal');if(!t)return;const d=document.createElement('div');d.textContent='[SISTEMA] '+msg;t.appendChild(d);t.scrollTop=t.scrollHeight}
 function openModal(type){currentTab=type;modalEditing=false;const m=$('modal-content');m.innerHTML='<h2>◈ CARREGANDO '+esc(type.toUpperCase())+'...</h2>';$('modal-bg').classList.add('open');renderModal(type)}
-function closeModal(){if(voiceRecorder?.state==='recording'){voiceRecorder.stop()}stopVoiceStream();$('modal-bg').classList.remove('open');modalEditing=false}
+function closeModal(){if(voiceRecorder?.state==='recording'){voiceRecorder.onstop=null;voiceRecorder.stop();voiceChunks=[]}clearTimeout(window.voiceTimeout);stopVoiceStream();$('modal-bg').classList.remove('open');modalEditing=false}
 function modalStatus(msg,err=false){let el=$('modal-feedback');if(!el){el=document.createElement('p');el.id='modal-feedback';el.className='note';$('modal-content')?.prepend(el)}el.textContent=msg;el.style.color=err?'#ff8c94':'#73d6b4';el.style.padding='10px';el.style.border='1px solid '+(err?'#9c4354':'#2c685e');el.style.background='#101f29';el.scrollIntoView({behavior:'smooth',block:'nearest'});notice(msg,err)}
 $('modal-bg').addEventListener('click',e=>{if(e.target.id==='modal-bg')closeModal()});
 function go(tab,el){document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));el.classList.add('active');if(tab==='painel')closeModal();else openModal(tab)}
@@ -155,20 +155,33 @@ else if(type==='conexoes'||type==='simular'){
 }
 else h=`<h2>◇ INVESTIGAÇÃO</h2><div class="record">Hipótese H-001: Henrique pode ter encerrado o expediente e ido para casa. Não confirmada.</div><button class="btn" onclick="openModal('conexoes')">MAPEAR RELAÇÕES</button><button class="btn" onclick="openModal('teorias')">CONFRONTAR TEORIAS</button>`;
 m.innerHTML=h;restoreDraft()}
-// V4.3: voz compartilhada usando a tabela evidence e o bucket existentes.
+// V4.4: gravação de áudio com detecção de codec e diagnóstico de Storage.
 function voiceStatus(message,isError=false){const el=$('voice-status');if(el){el.textContent=message;el.className=isError?'note recording':'note'}notice(message,isError)}
 function stopVoiceStream(){if(voiceStream){voiceStream.getTracks().forEach(t=>t.stop());voiceStream=null}}
+function voiceFormat(){
+ const candidates=[['audio/mp4;codecs=mp4a.40.2','m4a'],['audio/mp4','m4a'],['audio/webm;codecs=opus','webm'],['audio/webm','webm'],['audio/ogg;codecs=opus','ogg'],['audio/ogg','ogg']];
+ return candidates.find(([mime])=>MediaRecorder.isTypeSupported(mime))||null;
+}
+function voiceUploadError(error,mime){
+ const raw=error?.message||String(error);
+ if(/mime type|unsupported mime|not supported|invalid mime/i.test(raw))return 'O Supabase Storage recusou o formato '+mime+'. No projeto Supabase desta Central, execute o arquivo AJUSTE_AUDIO_SUPABASE.sql no SQL Editor para autorizar áudio no bucket team-evidence. Detalhe técnico: '+raw;
+ if(/payload too large|file size|exceeded.*size|maximum.*size/i.test(raw))return 'O limite de tamanho do bucket foi atingido. Detalhe: '+raw;
+ return raw;
+}
 async function startVoice(){
  if(voiceBusy||voiceRecorder?.state==='recording')return;
  if(!navigator.mediaDevices?.getUserMedia||typeof MediaRecorder==='undefined'){voiceStatus('Este navegador não suporta gravação de áudio. Use HTTPS e um navegador atualizado.',true);return}
  try{
+  const format=voiceFormat();
+  if(!format){voiceStatus('Nenhum formato de gravação compatível foi encontrado neste navegador.',true);return}
   voiceStream=await navigator.mediaDevices.getUserMedia({audio:true});
-  const types=['audio/webm;codecs=opus','audio/mp4','audio/webm','audio/ogg;codecs=opus'];
-  const mime=types.find(t=>MediaRecorder.isTypeSupported(t));
-  voiceRecorder=new MediaRecorder(voiceStream,mime?{mimeType:mime}:undefined);voiceChunks=[];
+  voiceRecorder=new MediaRecorder(voiceStream,{mimeType:format[0]});voiceMime=voiceRecorder.mimeType||format[0];voiceChunks=[];
+  voiceRecordedTitle=$('voice-title')?.value.trim()||'Mensagem de voz';
   voiceRecorder.ondataavailable=e=>{if(e.data?.size)voiceChunks.push(e.data)};
-  voiceRecorder.onstop=async()=>{stopVoiceStream();clearTimeout(window.voiceTimeout);if(!$('modal-bg').classList.contains('open'))return;await submitVoice()};
-  voiceRecorder.start(1000);$('voice-start').disabled=true;$('voice-stop').disabled=false;voiceStatus('● GRAVANDO... Finalize para enviar (máximo 90 segundos).');
+  voiceRecorder.onerror=e=>voiceStatus('Erro durante a gravação: '+(e.error?.message||'falha do gravador'),true);
+  voiceRecorder.onstop=async()=>{stopVoiceStream();clearTimeout(window.voiceTimeout);if(!$('modal-bg').classList.contains('open')){voiceChunks=[];return}await submitVoice()};
+  voiceRecorder.start(1000);$('voice-start').disabled=true;$('voice-stop').disabled=false;
+  voiceStatus('● GRAVANDO ('+voiceMime+')... Finalize para enviar (máximo 90 segundos).');
   window.voiceTimeout=setTimeout(()=>{if(voiceRecorder?.state==='recording')stopVoice()},90000);
  }catch(e){stopVoiceStream();voiceStatus('Microfone indisponível: '+(e.message||e),true)}
 }
@@ -176,15 +189,23 @@ function stopVoice(){if(voiceRecorder?.state==='recording'){voiceRecorder.stop()
 async function submitVoice(){
  if(voiceBusy)return;voiceBusy=true;
  try{
-  const mime=voiceRecorder?.mimeType?.split(';')[0]||'audio/webm';const blob=new Blob(voiceChunks,{type:mime});
-  if(!blob.size)throw new Error('A gravação ficou vazia.');
+  if(!sb||!sessionUser)throw new Error('Sessão não autenticada. Entre novamente na Central.');
+  const mime=(voiceMime||voiceRecorder?.mimeType||'audio/webm').split(';')[0].toLowerCase();
+  const blob=new Blob(voiceChunks,{type:mime});
+  if(!blob.size)throw new Error('A gravação ficou vazia. Tente novamente.');
   if(blob.size>10*1024*1024)throw new Error('Gravação maior que 10 MB. Faça uma mensagem menor.');
-  const ext=mime.includes('mp4')?'m4a':mime.includes('ogg')?'ogg':'webm';
-  const title=$('voice-title')?.value.trim()||'Mensagem de voz';
+  const ext=mime==='audio/mp4'?'m4a':mime==='audio/ogg'?'ogg':'webm';
   const path=sessionUser.id+'/'+crypto.randomUUID()+'-voz.'+ext;
-  const {error:uploadError}=await sb.storage.from('team-evidence').upload(path,blob,{contentType:mime,upsert:false});if(uploadError)throw uploadError;
-  await requireData(sb.from('evidence').insert({title:'🎙 '+title,description:'Mensagem de voz compartilhada pela equipe.',location_label:'COMUNICAÇÕES DA EQUIPE',kind:'audio',file_path:path,author_id:sessionUser.id}),'Registrar mensagem de voz');
-  voiceStatus('✓ Mensagem de voz publicada para a equipe.');modalEditing=false;await refresh();renderModal('evidencias');voiceStatus('✓ Mensagem publicada. Use OUVIR NA CENTRAL na lista abaixo.');
+  voiceStatus('Enviando áudio ('+(blob.size/1024).toFixed(0)+' KB, '+mime+')...');
+  const {error:uploadError}=await sb.storage.from('team-evidence').upload(path,blob,{contentType:mime,upsert:false});
+  if(uploadError)throw new Error(voiceUploadError(uploadError,mime));
+  try{
+   await requireData(sb.from('evidence').insert({title:'🎙 '+voiceRecordedTitle,description:'Mensagem de voz compartilhada pela equipe.',location_label:'COMUNICAÇÕES DA EQUIPE',kind:'audio',file_path:path,author_id:sessionUser.id}),'Registrar mensagem de voz');
+  }catch(metadataError){
+   const {error:cleanupError}=await sb.storage.from('team-evidence').remove([path]);
+   throw new Error('Áudio enviado, mas o registro da evidência falhou: '+(metadataError.message||metadataError)+(cleanupError?' (a limpeza do arquivo também falhou: '+cleanupError.message+')':''));
+  }
+  modalEditing=false;await refresh();renderModal('evidencias');voiceStatus('✓ Mensagem publicada. Use OUVIR NA CENTRAL na lista abaixo.');
  }catch(e){voiceStatus('Falha no envio da voz: '+(e.message||e),true)}
  finally{voiceBusy=false;voiceChunks=[];if($('voice-start'))$('voice-start').disabled=false;if($('voice-stop'))$('voice-stop').disabled=true}
 }
